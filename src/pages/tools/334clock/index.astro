@@ -1,0 +1,20 @@
+---
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import Clock from '@/components/Clock.vue';
+import PageHead from '@/components/PageHead.astro';
+import Layout from '@/layouts/Layout.astro';
+---
+
+<Layout class="max-w-3xl">
+  
+ 
+  <PageHead slot="head" title="334 Clock" description="最小 1 ms から調整できるリューズが備わっているミリ秒時計です。" />
+
+
+  <Breadcrumbs items={[{ label: 'Tools', href: '/tools' }, { label: '334 Clock' }]} />
+
+  <section class="flex flex-col items-center justify-center">
+    <Clock client:load />
+  </section>
+
+</Layout>

@@ -1,0 +1,226 @@
+---
+import BlogCard from '@/components/BlogCard.astro'
+import Link from '@/components/Link.astro'
+import PageHead from '@/components/PageHead.astro'
+import { buttonVariants } from '@/components/ui/button'
+import { SITE } from '@/consts'
+import Layout from '@/layouts/Layout.astro'
+import { getRecentPosts } from '@/lib/data-utils'
+
+const blog = await getRecentPosts(SITE.featuredPostCount)
+---
+<Layout class="max-w-3xl">
+  <PageHead slot="head" title="Home" />
+
+  <section class="flex flex-col items-center">
+    <div id="title">
+    </div>
+
+    <!-- 説明文ｶｯｺｶﾘ -->
+    <p id="tool-description" class="text-center text-sm text-muted-foreground" style="height: 3em; transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;">
+      現状は、自分が普段使うツール集をぼちぼち公開しています。今後はてなブログより記事を移植予定。
+    </p>
+
+  <!-- Hello world!のアニメーションがページ遷移後まで続いてしまうことを避けるため、 data-astro-reloadを追加 -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 25px; margin-top: 1rem;">
+      <a 
+        id="clock" 
+        href="/tools/334clock/" data-astro-reload
+        style="display: block; background-color: rgb(146, 218, 174); border-radius: 50px; text-align: center; font-size: 20pt; width: 200pt; padding: 15px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s ease; text-decoration: none; color: inherit;">
+        ミリ秒時計
+      </a>
+      <a 
+        id="exam-timer-link" 
+        href="/tools/exam-timer/" 
+        style="display: block; background-color: rgb(146, 174, 218); border-radius: 50px; text-align: center; font-size: 20pt; width: 200pt; padding: 15px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s ease; text-decoration: none; color: inherit;">
+        Exam Timer
+      </a>
+    </div>
+  </section>
+
+  <section class="flex flex-col gap-y-4">
+    <h2 class="text-2xl font-medium">Latest posts</h2>
+    <ul class="flex flex-col gap-y-4">
+      {
+        blog.map((post) => (
+          <li>
+            <BlogCard entry={post} />
+          </li>
+        ))
+      }
+    </ul>
+    <div class="flex justify-center">
+      <Link href="/blog" class={buttonVariants({ variant: 'ghost' }) + ' group'}>
+        See all posts <span class="ml-1.5 transition-transform group-hover:translate-x-1">&rarr;</span>
+      </Link>
+    </div>
+  </section>
+</Layout>
+
+<style is:global>
+  /* --- アニメーション --- */
+  @keyframes rotate-letter-once {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
+  }
+  @keyframes move-out-left {
+    from { transform: translateX(0%); }
+    to { transform: translateX(-40vw); }
+  }
+  @keyframes move-in-from-right {
+    from { transform: translateX(40vw); }
+    to { transform: translateX(0%); }
+  }
+
+  /* --- 要素のスタイル --- */
+  .title-container {
+    text-align: center;
+    white-space: nowrap;
+    font-size: 2em;
+    margin-top: 3vh; 
+    margin-bottom: 5vh;
+    will-change: transform;
+  }
+  .title-container span {
+    display: inline-block;
+    transition: opacity 0.5s, transform 0.5s;
+    will-change: transform, opacity;
+  }
+
+  /* --- JavaScriptで制御するアニメーション用クラス --- */
+  .is-rotating {
+    animation: rotate-letter-once 0.4s linear;
+  }
+  .is-moving-out {
+    animation: move-out-left 4s linear forwards;
+  }
+  .is-moving-in {
+    animation: move-in-from-right 4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+
+  #tool-description.fade-out {
+    opacity: 0;
+    transform: translateY(10px); /* 少し下へ */
+  }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const titleContainer = document.getElementById('title');
+    const descriptionEl = document.getElementById('tool-description');
+    const clockLink = document.getElementById('clock');
+    const examTimerLink = document.getElementById('exam-timer-link');
+
+    if (titleContainer) {
+      const text = "Hello world! ";
+      const characters = text.split('').map(char => {
+        const character = (char === ' ') ? '&nbsp;' : char;
+        return `<span>${character}</span>`;
+      }).join('');
+      titleContainer.innerHTML = characters;
+      titleContainer.classList.add('title-container');
+      
+      const letters = Array.from(titleContainer.querySelectorAll('span'));
+      const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+
+      async function animationCycle() {
+        if (!titleContainer) return;
+
+        titleContainer.className = 'title-container';
+        letters.forEach(l => {
+          if (l instanceof HTMLElement) {
+            l.style.opacity = '1';
+            l.style.transform = 'scale(1)';
+          }
+        });
+        await delay(2000);
+        
+        for (const letter of letters) {
+          if (letter.textContent?.trim() !== '') {
+            letter.classList.add('is-rotating');
+            await delay(150);
+            letter.classList.remove('is-rotating');
+          }
+        }
+        await delay(300);
+
+        titleContainer.classList.add('is-moving-out');
+        for (const letter of letters) {
+           if (letter.textContent?.trim() !== '' && letter instanceof HTMLElement) {
+            letter.style.opacity = '0';
+            letter.style.transform = 'scale(0.5)';
+            await delay(150);
+          }
+        }
+        await new Promise<void>((resolve) => { 
+          const handler = () => {
+            if (!titleContainer) return;
+            titleContainer.removeEventListener('animationend', handler);
+            resolve();
+          };
+          titleContainer.addEventListener('animationend', handler);
+        });
+
+        titleContainer.classList.remove('is-moving-out');
+        titleContainer.classList.add('is-moving-in');
+        await delay(500);
+
+        for (const letter of letters) {
+          if (letter.textContent?.trim() !== '' && letter instanceof HTMLElement) {
+            letter.style.opacity = '1';
+            letter.style.transform = 'scale(1)';
+            await delay(150);
+          }
+        }
+        await new Promise<void>((resolve) => { 
+          const handler = () => {
+            if (!titleContainer) return;
+            titleContainer.removeEventListener('animationend', handler);
+            resolve();
+          };
+          titleContainer.addEventListener('animationend', handler);
+        });
+
+        animationCycle();
+      }
+      setTimeout(animationCycle, 2000);
+    }
+
+    const links = document.querySelectorAll('#clock, #exam-timer-link');
+    links.forEach(link => {
+      if (link instanceof HTMLElement) {
+        link.onmouseover = () => { link.style.transform = 'translateY(-5px)'; };
+        link.onmouseout = () => { link.style.transform = 'translateY(0px)'; };
+      }
+    });
+
+    if (descriptionEl && clockLink && examTimerLink) {
+      const originalText = '現状は、自分が普段使うツール集をぼちぼち公開しています。今後はてなブログより記事を移植予定。';
+
+      // なんもわからん: (newText) -> (newText: string)
+      const changeDescription = (newText: string) => {
+        descriptionEl.classList.add('fade-out');
+        setTimeout(() => {
+          if (descriptionEl) {
+            descriptionEl.textContent = newText;
+            descriptionEl.classList.remove('fade-out');
+          }
+        }, 300);
+      };
+
+      clockLink.addEventListener('mouseenter', () => {
+        changeDescription('最小 1ms から調整可能なリューズが備わっているミリ秒時計です。');
+      });
+      examTimerLink.addEventListener('mouseenter', () => {
+        changeDescription('試験の開始時刻にあわせてタイマーを設定できる時計です。');
+      });
+      
+      const linkContainer = clockLink.parentElement;
+      if (linkContainer) {
+        linkContainer.addEventListener('mouseleave', () => {
+          changeDescription(originalText);
+        });
+      }
+    }
+  });
+</script>

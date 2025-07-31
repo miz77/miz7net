@@ -1,0 +1,57 @@
+---
+import AuthorCard from '@/components/AuthorCard.astro'
+import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import PageHead from '@/components/PageHead.astro'
+import Layout from '@/layouts/Layout.astro'
+import { getAllAuthors } from '@/lib/data-utils'
+
+const authors = await getAllAuthors()
+---
+
+<Layout class="max-w-3xl">
+  <PageHead slot="head" title="Authors" />
+  <Breadcrumbs items={[{ label: 'Authors', icon: 'lucide:users' }]} />
+  {
+    authors.length > 0 ? (
+      <ul class="flex flex-col gap-4">
+        {authors.map((author) => (
+          <li>
+            <AuthorCard author={author} />
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="text-muted-foreground text-center">No authors found.</p>
+    )
+  }
+  
+  <a href="https://spotify-recently-played-readme.vercel.app/api?user=5ep2xrigwcpi04edd49hqp91o&count=10&width=400" target="_blank" rel="noopener noreferrer">
+    <img 
+      id="spotify-history-image"
+      src="" 
+      alt="Spotifyの直近の再生履歴"
+      style="max-width: 400px; width: 100%;"
+    />
+  </a>
+
+
+  <script>
+    function updateSpotifyImage() {
+      const imageElement = document.getElementById('spotify-history-image') as HTMLImageElement;
+      if (!imageElement) return;
+
+      const imageUrl = 'https://spotify-recently-played-readme.vercel.app/api?user=5ep2xrigwcpi04edd49hqp91o&count=10&width=400';
+      
+
+      // 1時間は 3.6×10^5 msであることを考慮する (ミリ秒 ÷ 3600000ms)
+      const hourlyCacheBuster = Math.floor(new Date().getTime() / 3600000);
+      const urlWithCacheBuster = `${imageUrl}&_=${hourlyCacheBuster}`;
+      
+      imageElement.src = urlWithCacheBuster;
+    }
+
+    document.addEventListener('astro:page-load', updateSpotifyImage);
+  </script>
+
+
+</Layout>

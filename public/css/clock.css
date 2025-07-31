@@ -1,0 +1,116 @@
+
+/* 現在使用していないが、一旦置いておく。 */
+/* body全体のスタイル */
+body {
+  font-family: sans-serif;     /* 時計以外の基本フォント */
+  background-color: #f0f4f8;
+  color: #333;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* アプリ全体のコンテナ */
+#app {
+  text-align: center;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+}
+
+/* アプリタイトル */
+#title {
+  color: #ffffff;
+  background-color: #4CAF50;  /* 元の色に近い緑 */
+  border-radius: 25px;
+  padding: 10px 20px;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 25px;
+}
+
+/* 時計表示部分のスタイル */
+#clock {
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    /* 代表的UIフォントをフォールバック */
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+
+  /* 細い数字を出す */
+  font-weight: 150;                     /* 理想は iOS 7 のあの細さ　*/
+  font-feature-settings: 'tnum' 1;      /* タブラー数字 */
+  font-variant-numeric: tabular-nums;   /* 〃 */
+  font-feature-settings: 'lnum' 1;      /* ライニング数字 */
+
+  /* Retina環境でよりシャープに */
+  -webkit-font-smoothing: antialiased;
+  font-size: clamp(2.5rem, 10vw, 4rem);
+  color: #2c3e50; /* 作成者の目が悪いからか、#000000にすると浮いて見えるのでネイビーへ変更 */
+  background-color: #ecf0f1;
+  padding: 15px;
+  border-radius: 10px;
+ 
+}
+
+/* 調整ミリ秒の表示 */
+#clock2 {
+  font-size: 16px;
+  color: #7f8c8d;
+  margin-top: 15px;
+  margin-bottom: 30px;
+}
+
+/* ボタンの共通スタイル */
+.button {
+  display: inline-block;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  margin: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  min-width: 120px;
+  touch-action: manipulation;    /* タップをすぐクリックに変換 */
+  -webkit-tap-highlight-color: transparent; /* タップハイライトを抑制 */
+  user-select: none;            /* 長押しで選択されるのを防止 */
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* ボタンの色設定 */
+.plus           { background-color: #3498db; }
+.minus          { background-color: #e74c3c; }
+.plus-large     { background-color: #2980b9; }
+.minus-large    { background-color: #c0392b; }
+.plus-small     { background-color: #5dade2; }
+.minus-small    { background-color: #ec7063; }
+
+/* ボタンのコンテナ */
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}

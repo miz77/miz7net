@@ -1,0 +1,216 @@
+---
+import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import Layout from '@/layouts/Layout.astro'
+import PageHead from '@/components/PageHead.astro'
+// import { Image } from 'astro:assets'
+
+const commitHash = import.meta.env.CF_PAGES_COMMIT_SHA?.slice(0, 7) || 'local'
+---
+
+<Layout class="max-w-3xl">
+  <PageHead slot="head" title="Changelog" />
+  <Breadcrumbs items={[{ label: 'Changelog', icon: 'lucide:info' }]} />
+  <section class="flex flex-col gap-y-4">
+    <h1 class="text-3xl font-medium">Changelog</h1>
+
+    <article class="flex flex-col gap-y-2">
+      <h2 class="text-2xl font-medium">2025年7月31日</h2>
+      <p class="text-1xl text-muted-foreground"> Commit <span class="font-mono">{commitHash}</span> </p>
+      
+      <ul class="list-disc pl-5">
+        <li> 
+        About ページに 334 Clock の GitHub リポジトリ及び Chrome Web Store へのリンクを追加。
+        <br>
+        <br>
+        </li>
+        <li> 
+        334 Clock に関してリファクタリングを実施。 <br>
+        ( スタンドアロンから変更し、`Layout` を用いてレイアウトを他ページと統一。ダークモードを実装。一部ボタンの配色を変更。)
+        </li>
+        <br>
+        <li>
+       334 Clock のページで tools をクリックすると /about/ へ リダイレクトするように。
+        <br>
+        <br>
+        <li> 
+        トップページから 334 Clock へ遷移した時、Hello world! のアニメーションが遷移後まで続いてしまうことを避けるため、 要素に data-astro-reload を追加。
+        </li>
+         <br>
+        <li> 
+        /Authors へ Spotify の直近の再生履歴を追加。<br>Thanks to spotify-recently-played-readme.vercel.app.
+        </li>
+         <br>
+      </ul>
+    </article>
+
+
+
+    <article class="flex flex-col gap-y-2">
+      <h2 class="text-2xl font-medium">2025年7月29日</h2>
+      <p class="text-1xl text-muted-foreground"> Commit <span class="font-mono">ada17a7</span> </p>
+      
+      <ul class="list-disc pl-5">
+        <li> 
+        ファビコンをベンゼン環に差し替え。OGP周りの整備が一旦完了。
+        <br>
+        <br>
+        </li>
+        <li> 
+        前回 ( Commit cdcf56c ) の実装ではビルドごとにロゴが固定されてしまい、ページリロードごとには切り替わっていませんでした。
+        <br>
+        </li>
+        <br>
+        <li>
+       ランダムロゴ表示ロジックを修正。
+        <br>
+        新規作成した defer 付きの random-logo.js で読み込み、DOMContentLoaded／astro:page-load イベントが発生する度に fetch() → innerHTML で SVG を挿入するように。
+        </li>
+        <br>
+      </ul>
+      
+    </article>
+
+
+
+    <article class="flex flex-col gap-y-2">
+      <h2 class="text-2xl font-medium">2025年7月27日</h2>
+      <p class="text-1xl text-muted-foreground"> Commit <span class="font-mono">cdcf56c</span> </p>
+      
+      <ul class="list-disc pl-5">
+        <li>ヘッダーに置くロゴを変更。
+        <br>
+        ロード時に、3 種のアニメーションの中からランダムで読み込まれます。
+        <br>
+        環状化合物をモチーフにしたロゴを中心に、今後追加予定。現在は cyclohexane, benzene, pyrridine のみ。
+        </li>
+        <br>
+      </ul>
+      
+    </article>
+
+
+
+    <article class="flex flex-col gap-y-2">
+      <h2 class="text-2xl font-medium">2025年7月26日</h2>
+      <p class="text-1xl text-muted-foreground"> Commit <span class="font-mono">90d86d6</span> </p>
+      
+      <ul class="list-disc pl-5">
+        <li>334 Clock の大幅な改訂。
+        </li>
+        <br>
+        <li>About / このサイトについて の文章を改訂。<br>./ツール集/334 Clock のサムネイルを 1200px × 630 px へ修正。
+        </li>
+        <br>
+        <li>334 Clock へのショートカットを追加。(/334)
+        </li>
+        <br>
+        <li>Exam Timer へのショートカットを追加。(/timer)
+        </li>
+        <br>
+      </ul>
+      
+    </article>
+
+
+
+    <article class="flex flex-col gap-y-2">
+      <h2 class="text-2xl font-medium">2025年7月23日</h2>
+      <p class="text-1xl text-muted-foreground"> Commit <span class="font-mono">0143dda</span> </p>
+      
+      <ul class="list-disc pl-5">
+        <li>フッダー及び Changelog に、リポジトリの最新コミットを示す SHA の先頭 7 文字が表示されるように。
+        </li>
+        <br>
+        <li>
+          ページ遷移後にトップページのアニメーションが再実行されない問題を修正。<br>
+          <span class="text-ms">
+            ( astro:transitions の ClientRouter (旧: View Transitions API) 適用下で、トリガーを `DOMContentLoaded` ではなく `astro:page-load` に変更することで回避。 )
+          </span>
+        </li>
+        <br>
+        <li>Changelog を新設。</li>
+        <br>
+        <li>旧サイトよりトップページ、334 Clock、Exam Timer を移植、公開。</li>
+      </ul>
+      
+    </article>
+  </section>
+<br>
+  <section class="flex flex-col gap-y-4">
+    <h1 class="text-3xl font-medium">To do</h1>
+    <article class="flex flex-col gap-y-2">
+
+    {/* line-through には text-slate-400 dark:text-slate-500 がちょうどよい */}
+
+      <label class="flex items-center gap-x-2 line-through text-slate-400 dark:text-slate-500">
+        <span class="custom-checkbox is-checked"></span>
+        サイト上に、ホスティング中のリポジトリの最新コミットを示す識別符号を記載する。（ところでこの識別符号はなんと呼ぶのですか）
+      </label>
+
+      <label class="flex items-center gap-x-2">
+        <span class="custom-checkbox"></span>
+        Exam Timer の試験プリセットを増やす。
+      </label>
+
+      <label class="flex items-center gap-x-2">
+        <span class="custom-checkbox"></span>
+        はてなブログの記事を移植する。
+      </label>
+
+      <label class="flex items-center gap-x-2 line-through text-slate-400 dark:text-slate-500">
+        <span class="custom-checkbox is-checked"></span>
+        ページ遷移後にトップページのアニメーションが再実行されない問題を解決する。
+      </label>
+
+      <label class="flex items-center gap-x-2">
+        <span class="custom-checkbox"></span>
+        miz7netリポジトリをパブリックへ移す。
+      </label>
+
+      <label class="flex items-center gap-x-2">
+        <span class="custom-checkbox"></span>
+        PageSpeed Insights 提供のモバイルにおけるパフォーマンス評価を 99 から 100 へ改善し、すべての評価を満点にする。
+      </label>
+
+      <label class="flex items-center gap-x-2">
+        <span class="custom-checkbox"></span>
+        /blog 配下のディレクトリを構造化する。
+      </label>
+
+    </article>
+  </section>
+</Layout>
+
+<style is:global>
+  /* チェックボックスの基本的な形（空の四角） */
+  .custom-checkbox {
+    display: inline-block;
+    position: relative;
+    width: 16px;
+    height: 16px;
+    background-color: transparent;
+    border: 2px solid #94a3b8; /* 枠線の色 (slate-400) */
+    border-radius: 4px;
+    margin-right: 4px;
+    flex-shrink: 0; /* 縮まないようにする */
+  }
+
+  /* is-checkedクラスが付いた時のスタイル（チェック済みの状態） */
+  .custom-checkbox.is-checked {
+    background-color: #22c55e; /* 背景を緑色に */
+    border-color: #22c55e;     /* 枠線も緑色に */
+  }
+
+  /* is-checkedクラスが付いた時に、::after擬似要素でチェックマークを描画 */
+  .custom-checkbox.is-checked::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 0px;
+    width: 5px;
+    height: 10px;
+    border: solid white; /* チェックマークの色 */
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+  }
+</style>

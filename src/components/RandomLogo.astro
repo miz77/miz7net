@@ -1,0 +1,22 @@
+---
+// src/components/RandomLogo.astro
+---
+<style>
+  #logo-wrapper {
+    /* 最初は隠しておく */
+    visibility: hidden;
+    width: 200px;
+    height: auto;
+  }
+  /* インラインされた <svg> に対してサイズ調整 */
+  #logo-wrapper svg {
+    width: 100%;
+    height: auto;
+  }
+</style>
+
+<div id="logo-wrapper" aria-label="Loading Logo"></div>
+
+<!-- 外部スクリプトを defer で読み込む -->
+<script src="/js/random-logo.js" defer is:inline></script>
+
