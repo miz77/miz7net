@@ -1,0 +1,17 @@
+---
+import Breadcrumbs from '@/components/Breadcrumbs_no_Header.astro';
+import ExamTimer from '@/components/Exam-Timer.astro';
+import PageHead from '@/components/PageHead.astro';
+import Layout from '@/layouts/Layout_no_Header.astro'; 
+---
+<Layout class="max-w-3xl">
+
+   <PageHead slot="head" title="Exam Timer" description="試験の開始時刻に合わせてタイマーを設定できる時計です。模擬試験の環境をより本番に近づけることが期待できます。" />
+
+   <Breadcrumbs items={[{ label: 'Tools', href: '/tools' }, { label: 'Exam Timer' }]} />
+
+
+  <section class="flex flex-col items-center justify-center ">
+    <ExamTimer />
+  </section>
+</Layout>
