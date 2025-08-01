@@ -1,0 +1,326 @@
+---
+// src/components/Exam-Timer.astro
+
+
+const presets = {
+  '電工二種・技能試験': { start: '11:30', end: '12:10' },
+};
+---
+
+<div id="exam-clock-wrapper">
+  <!-- メインコンテンツエリア -->
+  <div class="flex flex-col items-center justify-center w-full max-w-4xl pb-24">
+    <!-- アナログ時計 -->
+    <div id="analog-clock" class="relative w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] md:w-[500px] md:h-[500px] bg-white border-8 border-gray-300 dark:bg-gray-800 dark:border-slate-700 rounded-full shadow-2xl flex items-center justify-center cursor-grab active:cursor-grabbing mb-6 transition-colors duration-300">
+      <div class="absolute w-4 h-4 bg-gray-800 border-2 border-white dark:bg-slate-200 dark:border-gray-900 rounded-full z-20 transition-colors duration-300"></div>
+      <div id="hour-hand" class="hand-transition absolute w-2 h-[22%] bg-gray-700 dark:bg-slate-300 rounded-t-full bottom-1/2 origin-bottom z-10 transition-colors duration-300"></div>
+      <div id="minute-hand" class="hand-transition absolute w-1.5 h-[35%] bg-gray-700 dark:bg-slate-200 rounded-t-full bottom-1/2 origin-bottom z-10 transition-colors duration-300"></div>
+      <div id="second-hand" class="hand-transition absolute w-0.5 h-[40%] bg-red-500 bottom-1/2 origin-bottom z-10"></div>
+    </div>
+    
+    <!-- コントロールパネル -->
+    <div id="control-panel" class="bg-[#E9E9E9] dark:bg-gray-800/50 backdrop-blur-md p-6 rounded-2xl shadow-lg w-full max-w-md transition-colors duration-300">
+      <div class="mb-6">
+        <div id="elapsed-time-display" class="w-full text-center text-lg font-bold py-3 rounded-lg bg-[#ffffff] text-gray-700 dark:bg-slate-700 dark:text-slate-300 transition-colors duration-300 font-digital">
+          経過時間: 00:00:00
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+        <div>
+          <label for="preset-select" class="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 transition-colors duration-300">試験プリセット</label>
+          <select id="preset-select" class="w-full bg-white border-gray-300 text-gray-800 dark:bg-gray-700 dark:border-gray-600 dark:text-slate-200 rounded-lg px-2 py-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition">
+            <option value="custom">カスタム</option>
+            {Object.keys(presets).map(name => (
+              <option value={name}>{name}</option>
+            ))}
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="start-time" class="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 transition-colors duration-300">開始</label>
+            <input type="time" id="start-time" value="09:00" class="font-digital text-[15px] text-center w-full bg-white border-gray-300 text-gray-800 dark:bg-gray-700 dark:border-gray-600 dark:text-slate-200 rounded-lg px-2 py-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none  transition">
+          </div>
+          <div>
+            <label for="end-time" class="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 transition-colors duration-300">終了</label>
+            <input type="time" id="end-time" value="10:30" class="font-digital text-[15px] text-center w-full bg-white border-gray-300 text-gray-800 dark:bg-gray-700 dark:border-gray-600 dark:text-slate-200 rounded-lg px-2 py-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition">
+          </div>
+        </div>
+      </div>
+      <div class="mt-6">
+        <button id="start-reset-btn" class="w-full text-lg font-bold py-3 rounded-lg transition-all duration-300 ease-in-out bg-cyan-600 text-white hover:bg-cyan-500 shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-cyan-500 focus:ring-opacity-50">
+          試験開始
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- アラームモーダル -->
+  <div id="alarm-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-[60] flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 text-center shadow-2xl max-w-sm w-full transition-colors duration-300">
+      <h2 class="text-4xl font-bold text-red-500 mb-4 animate-pulse">試験終了！</h2>
+      <p class="text-gray-700 dark:text-slate-300 mb-6 transition-colors duration-300">お疲れ様でした。</p>
+      <button id="close-alarm-btn" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-6 rounded-lg transition">閉じる</button>
+    </div>
+  </div>
+  
+  <!-- 準備時間設定パネル -->
+  <div id="ready-time-panel" class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-3 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] dark:shadow-[0_-2px_10px_rgba(0,0,0,0.3)] transition-colors duration-300">
+    <div class="max-w-md mx-auto flex items-center justify-center gap-4">
+      <label class="font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap">準備時間:</label>
+      <div class="flex items-center gap-2">
+        <input type="number" id="ready-minutes" min="0" max="59" value="0" class="font-digital w-20 text-center bg-white border-gray-300 text-gray-800 dark:bg-gray-700 dark:border-gray-600 dark:text-slate-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition">
+        <span class="text-slate-600 dark:text-slate-300">分</span>
+        <input type="number" id="ready-seconds" min="0" max="59" value="10" class="font-digital w-20 text-center bg-white border-gray-300 text-gray-800 dark:bg-gray-700 dark:border-gray-600 dark:text-slate-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition">
+        <span class="text-slate-600 dark:text-slate-300">秒</span>
+      </div>
+    </div>
+  </div>
+
+  <audio id="alarm-sound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
+</div>
+
+<style>
+  .hand-transition {
+    transition: transform 0.2s cubic-bezier(.4,2.08,.55,.44);
+  }
+  #analog-clock {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none;     /* IE 10+ */
+    user-select: none;         /* Standard */
+  }
+</style>
+
+<script>
+  import { ExamTimer } from '../lib/timerLogic.ts';
+  import type { TimerState } from '../lib/timerLogic.ts';
+
+  const analogClock = document.getElementById('analog-clock')!;
+  const hourHand = document.getElementById('hour-hand') as HTMLElement;
+  const minuteHand = document.getElementById('minute-hand') as HTMLElement;
+  const secondHand = document.getElementById('second-hand') as HTMLElement;
+  
+  const elapsedTimeDisplay = document.getElementById('elapsed-time-display')!;
+  const presetSelect = document.getElementById('preset-select') as HTMLSelectElement;
+  const startTimeInput = document.getElementById('start-time') as HTMLInputElement;
+  const endTimeInput = document.getElementById('end-time') as HTMLInputElement;
+  const startResetBtn = document.getElementById('start-reset-btn')!;
+  
+  const readyMinutesInput = document.getElementById('ready-minutes') as HTMLInputElement;
+  const readySecondsInput = document.getElementById('ready-seconds') as HTMLInputElement;
+
+  const alarmModal = document.getElementById('alarm-modal')!;
+  const closeAlarmBtn = document.getElementById('close-alarm-btn')!;
+  const alarmSound = document.getElementById('alarm-sound') as HTMLAudioElement;
+
+   const presets: Record<string, { start: string; end: string; }> = {
+    '電工二種・技能試験': { start: '11:30', end: '12:10' },
+  };
+
+  let accumulatedSecondDeg = 0;
+  let accumulatedMinuteDeg = 0;
+  let accumulatedHourDeg = 0;
+  let lastElapsedSeconds = 0;
+  let isInitialized = false;
+  let isDragging = false; // ドラッグ状態の管理用
+
+  const handleStateUpdate = (state: TimerState) => {
+    if (!isInitialized || state.status === 'idle') {
+      const currentSecondForHand = Math.floor(state.elapsedSeconds % 60);
+      accumulatedSecondDeg = (currentSecondForHand / 60) * 360;
+      accumulatedMinuteDeg = ((state.displayMinute + (state.elapsedSeconds % 60) / 60) / 60) * 360;
+      accumulatedHourDeg = (((state.displayHour % 12) + state.displayMinute / 60) / 12) * 360;
+      
+      secondHand.style.transition = 'none';
+      minuteHand.style.transition = 'none';
+      hourHand.style.transition = 'none';
+      
+      secondHand.style.transform = `rotate(${accumulatedSecondDeg}deg)`;
+      minuteHand.style.transform = `rotate(${accumulatedMinuteDeg}deg)`;
+      hourHand.style.transform = `rotate(${accumulatedHourDeg}deg)`;
+      
+      void analogClock.offsetWidth;
+      
+      requestAnimationFrame(() => {
+        secondHand.style.transition = '';
+        minuteHand.style.transition = '';
+        hourHand.style.transition = '';
+      });
+      
+      lastElapsedSeconds = state.elapsedSeconds;
+      isInitialized = true;
+      
+    } else if (state.status === 'running' || state.status === 'readying') {
+      const deltaSeconds = state.elapsedSeconds - lastElapsedSeconds;
+      
+      accumulatedSecondDeg += (deltaSeconds / 60) * 360;
+      accumulatedMinuteDeg += (deltaSeconds / 3600) * 360;
+      accumulatedHourDeg += (deltaSeconds / 43200) * 360;
+      
+      secondHand.style.transform = `rotate(${accumulatedSecondDeg}deg)`;
+      minuteHand.style.transform = `rotate(${accumulatedMinuteDeg}deg)`;
+      hourHand.style.transform = `rotate(${accumulatedHourDeg}deg)`;
+      
+      lastElapsedSeconds = state.elapsedSeconds;
+    }
+    
+    if (state.status === 'readying') {
+      const remainingReadySeconds = -state.elapsedSeconds;
+      const minutes = Math.floor(remainingReadySeconds / 60);
+      const seconds = remainingReadySeconds % 60;
+      elapsedTimeDisplay.textContent = `準備時間: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    } else if (state.elapsedSeconds >= 0) {
+      const hours = Math.floor(state.elapsedSeconds / 3600);
+      const minutes = Math.floor((state.elapsedSeconds % 3600) / 60);
+      const seconds = state.elapsedSeconds % 60;
+      elapsedTimeDisplay.textContent = `経過時間: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+    
+    const isTimerActive = state.status === 'running' || state.status === 'readying';
+    startResetBtn.textContent = isTimerActive ? 'リセット' : '試験開始';
+    startResetBtn.classList.toggle('bg-orange-600', isTimerActive);
+    startResetBtn.classList.toggle('hover:bg-orange-500', isTimerActive);
+    startResetBtn.classList.toggle('bg-cyan-600', !isTimerActive);
+    startResetBtn.classList.toggle('hover:bg-cyan-500', !isTimerActive);
+    
+    [presetSelect, startTimeInput, endTimeInput, readyMinutesInput, readySecondsInput].forEach(el => (el.disabled = isTimerActive));
+    
+    if (state.status === 'finished') {
+      alarmSound.play().catch(e => console.error("Audio play failed:", e));
+      alarmModal.classList.remove('hidden');
+    }
+  };
+
+  const timer = new ExamTimer(handleStateUpdate);
+
+  startResetBtn.addEventListener('click', () => {
+    if (timer.currentStatus === 'running' || timer.currentStatus === 'readying') {
+      timer.reset();
+    } else {
+      timer.start();
+    }
+  });
+
+  const updateTimesFromInputs = () => {
+    const [startH, startM] = startTimeInput.value.split(':').map(Number);
+    const [endH, endM] = endTimeInput.value.split(':').map(Number);
+    timer.setExamTimes(startH, startM, endH, endM);
+  };
+  
+  const updateReadyTimeFromInputs = () => {
+    const minutes = parseInt(readyMinutesInput.value) || 0;
+    const seconds = parseInt(readySecondsInput.value) || 0;
+    timer.setReadyTime(minutes * 60 + seconds);
+  };
+
+  [startTimeInput, endTimeInput].forEach(input => {
+    input.addEventListener('change', () => {
+      presetSelect.value = 'custom';
+      updateTimesFromInputs();
+    });
+  });
+  
+  [readyMinutesInput, readySecondsInput].forEach(input => {
+      input.addEventListener('change', updateReadyTimeFromInputs);
+  });
+
+  presetSelect.addEventListener('change', () => {
+    const presetName = presetSelect.value;
+    if (presetName in presets) {
+      startTimeInput.value = presets[presetName].start;
+      endTimeInput.value = presets[presetName].end;
+      updateTimesFromInputs();
+    }
+  });
+  
+  closeAlarmBtn.addEventListener('click', () => {
+    alarmModal.classList.add('hidden');
+    alarmSound.pause();
+    alarmSound.currentTime = 0;
+    timer.reset();
+  });
+
+  const updateTimeFromEvent = (e: MouseEvent | Touch) => {
+    const rect = analogClock.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const dx = e.clientX - centerX;
+    const dy = e.clientY - centerY;
+    let angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
+    if (angle < 0) angle += 360;
+    
+    const newMinuteOnDial = Math.round(angle / 6) % 60;
+
+    let [currentHour, currentMinute] = startTimeInput.value.split(':').map(Number);
+    
+    if (currentMinute > 45 && newMinuteOnDial < 15) {
+      currentHour = (currentHour + 1) % 24;
+    } else if (currentMinute < 15 && newMinuteOnDial > 45) {
+      currentHour = (currentHour - 1 + 24) % 24;
+    }
+    
+    const finalHour = String(currentHour).padStart(2, '0');
+    const finalMinute = String(newMinuteOnDial).padStart(2, '0');
+    
+    startTimeInput.value = `${finalHour}:${finalMinute}`;
+    presetSelect.value = 'custom';
+    updateTimesFromInputs();
+  };
+
+  const handleDragStart = (e: MouseEvent | TouchEvent) => {
+    if (timer.currentStatus !== 'idle') return;
+    isDragging = true;
+    [hourHand, minuteHand, secondHand].forEach(hand => hand.classList.remove('hand-transition'));
+    updateTimeFromEvent('touches' in e ? e.touches[0] : e);
+  };
+
+  const handleDragMove = (e: MouseEvent | TouchEvent) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    updateTimeFromEvent('touches' in e ? e.touches[0] : e);
+  };
+
+  const handleDragEnd = () => {
+    if (isDragging) {
+      isDragging = false;
+      [hourHand, minuteHand, secondHand].forEach(hand => hand.classList.add('hand-transition'));
+    }
+  };
+
+  analogClock.addEventListener('mousedown', handleDragStart);
+  window.addEventListener('mousemove', handleDragMove);
+  window.addEventListener('mouseup', handleDragEnd);
+  
+  analogClock.addEventListener('touchstart', handleDragStart, { passive: false });
+  window.addEventListener('touchmove', handleDragMove, { passive: false });
+  window.addEventListener('touchend', handleDragEnd);
+  window.addEventListener('touchcancel', handleDragEnd);
+
+  const drawClockFace = () => {
+    const radius = analogClock.offsetWidth / 2 * 0.85;
+    for (let i = 1; i <= 12; i++) {
+      const numberDiv = document.createElement('div');
+      numberDiv.className = 'absolute text-center text-slate-600 dark:text-slate-300 transition-colors duration-300';
+      numberDiv.style.width = '40px';
+      numberDiv.style.height = '40px';
+      numberDiv.style.lineHeight = '40px';
+      numberDiv.style.fontSize = '1.5rem';
+      numberDiv.style.fontWeight = '500';
+      
+      const angle = i * 30 * Math.PI / 180;
+      const x = analogClock.offsetWidth / 2 + radius * Math.sin(angle);
+      const y = analogClock.offsetHeight / 2 - radius * Math.cos(angle);
+      
+      numberDiv.style.left = `${x}px`;
+      numberDiv.style.top = `${y}px`;
+      numberDiv.style.transform = 'translate(-69%, -69%)';
+
+      numberDiv.textContent = String(i);
+      analogClock.appendChild(numberDiv);
+    }
+  };
+  
+  drawClockFace();
+  updateTimesFromInputs();
+  updateReadyTimeFromInputs();
+</script>

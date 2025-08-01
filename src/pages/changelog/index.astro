@@ -14,8 +14,34 @@ const commitHash = import.meta.env.CF_PAGES_COMMIT_SHA?.slice(0, 7) || 'local'
     <h1 class="text-3xl font-medium">Changelog</h1>
 
     <article class="flex flex-col gap-y-2">
-      <h2 class="text-2xl font-medium">2025年7月31日</h2>
+      <h2 class="text-2xl font-medium">2025年8月2日</h2>
       <p class="text-1xl text-muted-foreground"> Commit <span class="font-mono">{commitHash}</span> </p>
+      
+      <ul class="list-disc pl-5">
+        <li> 
+        Exam Timer に関してリファクタリングを実施。 <br>
+        + スタンドアロンから変更し、`Layout_no_header.astro` を用いてレイアウトを他ページと一部統一。<br>
+        + 一部UIの配色を変更したうえでダークモードを実装。<br>
+        + これまで1枚のhtmlだったシステムを分離。
+        </li>
+        <br>
+        <li>
+        Exam Timer の統合に際して、ヘッダーなしレイアウト `Layout_no_header.astro` を追加。時計に意識を集中するためにヘッダーのロゴ等を削除。
+        <br>
+        <br>
+        <li> 
+        同様の理由で既存のものに ThemeToggle を載せた`Breadcrumbs_no_header.astro` を追加。
+        <br>
+        <br>
+      </ul>
+    </article>
+
+
+
+
+    <article class="flex flex-col gap-y-2">
+      <h2 class="text-2xl font-medium">2025年7月31日</h2>
+      <p class="text-1xl text-muted-foreground"> Commit <span class="font-mono">4fdc467</span> </p>
       
       <ul class="list-disc pl-5">
         <li> 
