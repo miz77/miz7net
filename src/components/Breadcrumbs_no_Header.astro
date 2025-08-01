@@ -8,7 +8,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 import { Icon } from 'astro-icon/components'
-import MobileMenu from '@/components/ui/mobile-menu'
+// import MobileMenu from '@/components/ui/mobile-menu'
 import ThemeToggle from '@/components/ThemeToggle.astro'
 
 export interface BreadcrumbItem {
@@ -28,7 +28,7 @@ const { items } = Astro.props
 <div class="flex w-full items-center justify-between">
   {/* パンくずリスト部分 */}
   <Breadcrumb>
-    <BreadcrumbList class="flex items-center">
+    <BreadcrumbList className="flex items-center">
       <BreadcrumbItem>
         <BreadcrumbLink href="/">
           <Icon name="lucide:home" class="size-4 shrink-0" />
@@ -67,7 +67,7 @@ const { items } = Astro.props
 
   {/* 右寄せ */}
   <div class="flex items-center ">
-   {/* <MobileMenu client:load transition:persist />  // Mobile時の View Transition による描画不良の問題が解決できなかったので一旦削除  */}
+   {/* <MobileMenu client:load transition:persist />  // Mobile時の View Transition による描画不良の問題が解決できなかったので  */}
     <ThemeToggle transition:persist />
   </div>
 </div>

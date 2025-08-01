@@ -1,14 +1,13 @@
 ---
 // src/components/Exam-Timer.astro
 
-import type { AstroGlobal } from 'astro';
 
 const presets = {
   '電工二種・技能試験': { start: '11:30', end: '12:10' },
 };
 ---
 
-<div id="exam-clock-wrapper" client:load>
+<div id="exam-clock-wrapper">
   <!-- メインコンテンツエリア -->
   <div class="flex flex-col items-center justify-center w-full max-w-4xl pb-24">
     <!-- アナログ時計 -->
@@ -114,7 +113,7 @@ const presets = {
   const closeAlarmBtn = document.getElementById('close-alarm-btn')!;
   const alarmSound = document.getElementById('alarm-sound') as HTMLAudioElement;
 
-  const presets = {
+   const presets: Record<string, { start: string; end: string; }> = {
     '電工二種・技能試験': { start: '11:30', end: '12:10' },
   };
 
@@ -227,7 +226,7 @@ const presets = {
 
   presetSelect.addEventListener('change', () => {
     const presetName = presetSelect.value;
-    if (presets[presetName]) {
+    if (presetName in presets) {
       startTimeInput.value = presets[presetName].start;
       endTimeInput.value = presets[presetName].end;
       updateTimesFromInputs();
@@ -240,8 +239,6 @@ const presets = {
     alarmSound.currentTime = 0;
     timer.reset();
   });
-
-  // --- ▼▼▼ ここからドラッグ機能のコードを追加 ▼▼▼ ---
 
   const updateTimeFromEvent = (e: MouseEvent | Touch) => {
     const rect = analogClock.getBoundingClientRect();
@@ -299,8 +296,6 @@ const presets = {
   window.addEventListener('touchend', handleDragEnd);
   window.addEventListener('touchcancel', handleDragEnd);
 
-  // --- ▲▲▲ ここまでドラッグ機能のコードを追加 ▲▲▲ ---
-
   const drawClockFace = () => {
     const radius = analogClock.offsetWidth / 2 * 0.85;
     for (let i = 1; i <= 12; i++) {
@@ -328,6 +323,4 @@ const presets = {
   drawClockFace();
   updateTimesFromInputs();
   updateReadyTimeFromInputs();
-  
-  
 </script>
