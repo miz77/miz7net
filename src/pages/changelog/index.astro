@@ -14,8 +14,24 @@ const commitHash = import.meta.env.CF_PAGES_COMMIT_SHA?.slice(0, 7) || 'local'
     <h1 class="text-3xl font-medium">Changelog</h1>
 
     <article class="flex flex-col gap-y-2">
-      <h2 class="text-2xl font-medium">2025年8月2日</h2>
+      <h2 class="text-2xl font-medium">2025年8月3日</h2>
       <p class="text-1xl text-muted-foreground"> Commit <span class="font-mono">{commitHash}</span> </p>
+      
+      <ul class="list-disc pl-5">
+        <li> 
+        Exam Timer に関してリファクタリングを実施。 <br>
+        + デジタル庁デザインシステムβ版 v2.6.0 で定義済みのプリミティブカラー、セマンティックカラー、リンクカラーの組み合わせ例を参考にボタンの配色を変更。<br>
+        + `Exam-Timer.astro`内での複数のスタイルによる衝突を解消。<br>
+        + 試験プリセットの定義の外部モジュール化を実施。
+        </li>
+        <br>
+
+      </ul>
+    </article>
+
+    <article class="flex flex-col gap-y-2">
+      <h2 class="text-2xl font-medium">2025年8月2日</h2>
+      <p class="text-1xl text-muted-foreground"> Commit <span class="font-mono">1e2bfdf</span> </p>
       
       <ul class="list-disc pl-5">
         <li> 
