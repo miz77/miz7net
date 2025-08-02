@@ -21,14 +21,14 @@ const presets = {
     <!-- コントロールパネル -->
     <div id="control-panel" class="bg-[#E9E9E9] dark:bg-gray-800/50 backdrop-blur-md p-6 rounded-2xl shadow-lg w-full max-w-md transition-colors duration-300">
       <div class="mb-6">
-        <div id="elapsed-time-display" class="w-full text-center text-lg font-bold py-3 rounded-lg bg-[#ffffff] text-gray-700 dark:bg-slate-700 dark:text-slate-300 transition-colors duration-300 font-digital">
+        <div id="elapsed-time-display" class="w-full text-center text-lg font-bold py-3 rounded-lg bg-[#ffffff] text-gray-700 dark:bg-gray-700 dark:text-slate-200 transition-colors duration-300 font-digital">
           経過時間: 00:00:00
         </div>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
         <div>
-          <label for="preset-select" class="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 transition-colors duration-300">試験プリセット</label>
+          <label for="preset-select" class="block text-sm font-medium text-[#484D4E] dark:text-[#95A6BE] mb-1 transition-colors duration-300">試験プリセット</label>
           <select id="preset-select" class="w-full bg-white border-gray-300 text-gray-800 dark:bg-gray-700 dark:border-gray-600 dark:text-slate-200 rounded-lg px-2 py-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition">
             <option value="custom">カスタム</option>
             {Object.keys(presets).map(name => (
@@ -38,17 +38,17 @@ const presets = {
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label for="start-time" class="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 transition-colors duration-300">開始</label>
+            <label for="start-time" class="block text-sm font-medium text-[#484D4E] dark:text-[#95A6BE] mb-1 transition-colors duration-300">開始</label>
             <input type="time" id="start-time" value="09:00" class="font-digital text-[15px] text-center w-full bg-white border-gray-300 text-gray-800 dark:bg-gray-700 dark:border-gray-600 dark:text-slate-200 rounded-lg px-2 py-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none  transition">
           </div>
           <div>
-            <label for="end-time" class="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 transition-colors duration-300">終了</label>
+            <label for="end-time" class="block text-sm font-medium text-[#484D4E] dark:text-[#95A6BE] mb-1 transition-colors duration-300">終了</label>
             <input type="time" id="end-time" value="10:30" class="font-digital text-[15px] text-center w-full bg-white border-gray-300 text-gray-800 dark:bg-gray-700 dark:border-gray-600 dark:text-slate-200 rounded-lg px-2 py-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition">
           </div>
         </div>
       </div>
       <div class="mt-6">
-        <button id="start-reset-btn" class="w-full text-lg font-bold py-3 rounded-lg transition-all duration-300 ease-in-out bg-cyan-600 text-white hover:bg-cyan-500 shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-cyan-500 focus:ring-opacity-50">
+        <button id="start-reset-btn" class="w-full text-lg font-bold py-3 rounded-lg transition-all duration-300 ease-in-out shadow-md hover:shadow-lg focus:outline-none focus:ring-opacity-50">
           試験開始
         </button>
       </div>
@@ -58,9 +58,9 @@ const presets = {
   <!-- アラームモーダル -->
   <div id="alarm-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-[60] flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 text-center shadow-2xl max-w-sm w-full transition-colors duration-300">
-      <h2 class="text-4xl font-bold text-red-500 mb-4 animate-pulse">試験終了！</h2>
+      <h2 class="text-4xl font-bold text-[#EC0000] mb-4 animate-pulse">試験終了！</h2>
       <p class="text-gray-700 dark:text-slate-300 mb-6 transition-colors duration-300">お疲れ様でした。</p>
-      <button id="close-alarm-btn" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-6 rounded-lg transition">閉じる</button>
+      <button id="close-alarm-btn" class="bg-[#259D63] hover:bg-[#197A4B] text-white font-bold py-2 px-6 rounded-lg transition">閉じる</button>
     </div>
   </div>
   
@@ -122,7 +122,31 @@ const presets = {
   let accumulatedHourDeg = 0;
   let lastElapsedSeconds = 0;
   let isInitialized = false;
-  let isDragging = false; // ドラッグ状態の管理用
+  let isDragging = false;
+
+  //  スタイルのセットを定義
+  // 「試験開始」ボタン（タイマー停止中）
+  const idleButtonClasses = [
+    'bg-[#0031D8]',
+    'text-white',
+    'hover:bg-white',
+    'hover:text-[#0031D8]',
+    'hover:ring-2',
+    'hover:ring-[#0031D8]',
+    'active:bg-[#E8F1FE]',
+    'active:text-[#0031D8]',
+    'focus:ring-2',
+    'focus:ring-[#0031D8]'
+  ];
+
+  // 「リセット」ボタン（タイマー作動中）のスタイル
+  const activeTimerButtonClasses = [
+    'bg-[#FDEEEE]',
+    'text-[#EC0000]',
+    'hover:bg-white',
+    'ring-2',
+    'focus:ring-[#EC0000]'
+  ];
 
   const handleStateUpdate = (state: TimerState) => {
     if (!isInitialized || state.status === 'idle') {
@@ -178,10 +202,16 @@ const presets = {
     
     const isTimerActive = state.status === 'running' || state.status === 'readying';
     startResetBtn.textContent = isTimerActive ? 'リセット' : '試験開始';
-    startResetBtn.classList.toggle('bg-orange-600', isTimerActive);
-    startResetBtn.classList.toggle('hover:bg-orange-500', isTimerActive);
-    startResetBtn.classList.toggle('bg-cyan-600', !isTimerActive);
-    startResetBtn.classList.toggle('hover:bg-cyan-500', !isTimerActive);
+    
+    if (isTimerActive) {
+      // タイマー作動中のスタイルを適用
+      startResetBtn.classList.remove(...idleButtonClasses);
+      startResetBtn.classList.add(...activeTimerButtonClasses);
+    } else {
+      // タイマー停止中のスタイルを適用
+      startResetBtn.classList.remove(...activeTimerButtonClasses);
+      startResetBtn.classList.add(...idleButtonClasses);
+    }
     
     [presetSelect, startTimeInput, endTimeInput, readyMinutesInput, readySecondsInput].forEach(el => (el.disabled = isTimerActive));
     
@@ -323,4 +353,5 @@ const presets = {
   drawClockFace();
   updateTimesFromInputs();
   updateReadyTimeFromInputs();
+  startResetBtn.classList.add(...idleButtonClasses);
 </script>
