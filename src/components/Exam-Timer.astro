@@ -2,9 +2,7 @@
 // src/components/Exam-Timer.astro
 
 
-const presets = {
-  '電工二種・技能試験': { start: '11:30', end: '12:10' },
-};
+import { presets } from '@/lib/timer-presets.ts';
 ---
 
 <div id="exam-clock-wrapper">
@@ -92,6 +90,7 @@ const presets = {
 </style>
 
 <script>
+  import { presets } from '../lib/timer-presets.ts'; 
   import { ExamTimer } from '../lib/timerLogic.ts';
   import type { TimerState } from '../lib/timerLogic.ts';
 
@@ -113,9 +112,6 @@ const presets = {
   const closeAlarmBtn = document.getElementById('close-alarm-btn')!;
   const alarmSound = document.getElementById('alarm-sound') as HTMLAudioElement;
 
-   const presets: Record<string, { start: string; end: string; }> = {
-    '電工二種・技能試験': { start: '11:30', end: '12:10' },
-  };
 
   let accumulatedSecondDeg = 0;
   let accumulatedMinuteDeg = 0;
@@ -255,13 +251,13 @@ const presets = {
   });
 
   presetSelect.addEventListener('change', () => {
-    const presetName = presetSelect.value;
-    if (presetName in presets) {
-      startTimeInput.value = presets[presetName].start;
-      endTimeInput.value = presets[presetName].end;
-      updateTimesFromInputs();
-    }
-  });
+  const key = presetSelect.value;
+  if (key in presets) {
+    startTimeInput.value = presets[key].start;
+    endTimeInput.value   = presets[key].end;
+    updateTimesFromInputs();
+  }
+});
   
   closeAlarmBtn.addEventListener('click', () => {
     alarmModal.classList.add('hidden');
